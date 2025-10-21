@@ -9,6 +9,9 @@ from telegram.ext import (
 )
 import nest_asyncio
 nest_asyncio.apply()
+import os
+
+BOT_TOKEN = os.environ['BOT_TOKEN']
 
 BOT_TOKEN = '8300808332:AAFpIwD_6wli3JKhrMu3elga8jF1jfIhdwM'  # Replace with your token
 
