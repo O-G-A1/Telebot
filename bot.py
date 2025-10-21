@@ -33,17 +33,16 @@ async def welcome(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"👋 Welcome {member.full_name}! Please read the group rules with /rules."
         )
 
-# Help command
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
-        [InlineKeyboardButton("🏁 Start", callback_data='start')],
         [InlineKeyboardButton("📜 Rules", callback_data='rules')],
         [InlineKeyboardButton("🔗 Links", callback_data='links')],
-        [InlineKeyboardButton("ℹ️ About", callback_data='about')]
+        [InlineKeyboardButton("ℹ️ About", callback_data='about')],
+        [InlineKeyboardButton("🪙 Crypto Portal", url="https://cryptoportal.byethost8.com")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text("📘 Available Commands:", reply_markup=reply_markup)
-
+    await update.message.reply_text("📘 Choose a help option:", reply_markup=reply_markup)
+    
 # Rules command
 async def rules_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
@@ -53,7 +52,7 @@ async def rules_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text(
       "📜 *Group Rules*\n"
-        "1️⃣ Be respectful to all members 🤝\n"
+      "1️⃣ Be respectful to all members 🤝\n"
         "2️⃣ No spam, scams, or self-promotion 🚫📢\n"
         "3️⃣ Use English only in discussions 🇬🇧🗣️\n"
         "4️⃣ No hate speech, racism, or discrimination ❌🧠\n"
@@ -116,7 +115,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if query.data == 'rules':
         await query.edit_message_text(
             "📜 Group Rules:\n"
-"        1️⃣ Be respectful to all members 🤝\n"
+"       1️⃣ Be respectful to all members 🤝\n"
         "2️⃣ No spam, scams, or self-promotion 🚫📢\n"
         "3️⃣ Use English only in discussions 🇬🇧🗣️\n"
         "4️⃣ No hate speech, racism, or discrimination ❌🧠\n"
