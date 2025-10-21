@@ -52,18 +52,18 @@ async def rules_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text(
-        "📜 Group Rules:\n"
-        "1. Be respectful to all members.\n"
-        "2. No spam, scams, or self-promotion.\n"
-        "3. Use English only in discussions.\n"
-        "4. No hate speech, racism, or discrimination.\n"
-        "5. Avoid sharing explicit or adult content.\n"
-        "6. Do not post fake news or misleading info.\n"
-        "7. Keep conversations on-topic.\n"
-        "8. No unsolicited private messages to members.\n"
-        "9. Report suspicious behavior to admins.\n"
-        "10. Admin decisions are final — follow instructions.",
-        reply_markup=reply_markup
+      "📜 *Group Rules*\n"
+        "1️⃣ Be respectful to all members 🤝\n"
+        "2️⃣ No spam, scams, or self-promotion 🚫📢\n"
+        "3️⃣ Use English only in discussions 🇬🇧🗣️\n"
+        "4️⃣ No hate speech, racism, or discrimination ❌🧠\n"
+        "5️⃣ Avoid sharing explicit or adult content 🔞🚫\n"
+        "6️⃣ Do not post fake news or misleading info 📰⚠️\n"
+        "7️⃣ Keep conversations on-topic 📌🗨️\n"
+        "8️⃣ No unsolicited private messages to members 📵📩\n"
+        "9️⃣ Report suspicious behavior to admins 🕵️‍♂️📣\n"
+        "🔟 Admin decisions are final — follow instructions 👮✅",
+        parse_mode="Markdown"
     )
 # Filter banned words
 async def filter_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -116,16 +116,16 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if query.data == 'rules':
         await query.edit_message_text(
             "📜 Group Rules:\n"
-            "1. Be respectful to all members.\n"
-            "2. No spam, scams, or self-promotion.\n"
-            "3. Use English only in discussions.\n"
-            "4. No hate speech, racism, or discrimination.\n"
-            "5. Avoid sharing explicit or adult content.\n"
-            "6. Do not post fake news or misleading info.\n"
-            "7. Keep conversations on-topic.\n"
-            "8. No unsolicited private messages to members.\n"
-            "9. Report suspicious behavior to admins.\n"
-            "10. Admin decisions are final — follow instructions."
+"        1️⃣ Be respectful to all members 🤝\n"
+        "2️⃣ No spam, scams, or self-promotion 🚫📢\n"
+        "3️⃣ Use English only in discussions 🇬🇧🗣️\n"
+        "4️⃣ No hate speech, racism, or discrimination ❌🧠\n"
+        "5️⃣ Avoid sharing explicit or adult content 🔞🚫\n"
+        "6️⃣ Do not post fake news or misleading info 📰⚠️\n"
+        "7️⃣ Keep conversations on-topic 📌🗨️\n"
+        "8️⃣ No unsolicited private messages to members 📵📩\n"
+        "9️⃣ Report suspicious behavior to admins 🕵️‍♂️📣\n"
+        "🔟 Admin decisions are final — follow instructions 👮✅",
         )
     elif query.data == 'links':
         await links_command(update, context)
