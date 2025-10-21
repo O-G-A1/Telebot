@@ -147,7 +147,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "It welcomes new members, filters spam, and shares useful info.\n"
             "Built by Gbenga 💻",
             reply_markup=InlineKeyboardMarkup([
-                [InlineKeyboardButton("👨‍💻 Developer", url="https://t.me/gbenga")],
+                [InlineKeyboardButton("👨‍💻 Developer", url="https://t.me/adeboye_99")],
                 [InlineKeyboardButton("📢 Updates Channel", url="https://t.me/cryptochainnetwork")]
             ])
         )
