@@ -17,7 +17,14 @@ if not BOT_TOKEN:
     print("❌ BOT_TOKEN is missing. Check Railway variables.")
     exit(1)
 
-BANNED_WORDS = ['spam', 'scam', 'badword']
+BANNED_WORDS = [
+    'spam', 'scam', 'badword', 'fake', 'fraud', 'click here',
+    'free money', 'nude', 'xxx', 'porn', 'sex', 'hate', 'racist',
+    'terror', 'kill', 'bomb', 'attack', 'drugs', 'weapon', 'casino',
+    'betting', 'gamble', 'credit card', 'make money fast', 'urgent',
+    'viagra', 'escort', 'adult', 'explicit', 'nsfw', 'malware',
+    'phishing', 'get rich quick'
+]
 
 # Welcome new members
 async def welcome(update: Update, context: ContextTypes.DEFAULT_TYPE):
