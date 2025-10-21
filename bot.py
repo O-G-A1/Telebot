@@ -69,15 +69,17 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 # Links command
+# Links command
 async def links_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
         [InlineKeyboardButton("🌐 Telegram", url="https://telegram.org")],
         [InlineKeyboardButton("📺 Join Channel", url="https://t.me/yourchannel")],
-        [InlineKeyboardButton("💻 GitHub Repo", url="https://github.com/yourrepo")]
+        [InlineKeyboardButton("💻 GitHub Repo", url="https://github.com/yourrepo")],
+        [InlineKeyboardButton("🪙 Crypto Portal", url="https://cryptoportal.byethost8.com")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text("🔗 Useful Links:", reply_markup=reply_markup)
-
+    
 # About command
 async def about_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
@@ -103,6 +105,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await links_command(update, context)
     elif query.data == 'about':
         await about_command(update, context)
+        
 
 # Main function
 async def main():
