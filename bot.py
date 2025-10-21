@@ -17,7 +17,8 @@ import os
 # for railway
 import os
 
-BOT_TOKEN = os.environ['8300808332:AAFpIwD_6wli3JKhrMu3elga8jF1jfIhdwM']
+# BOT_TOKEN = os.environ['8300808332:AAFpIwD_6wli3JKhrMu3elga8jF1jfIhdwM']
+BOT_TOKEN = os.environ['BOT_TOKEN']
 
 if not BOT_TOKEN:
     print("❌ BOT_TOKEN is missing. Check Railway variables.")
