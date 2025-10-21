@@ -53,9 +53,9 @@ async def filter_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # Start command with buttons
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
-        [InlineKeyboardButton("📜 Rules", callback_data='rules')],
-        [InlineKeyboardButton("🔗 Links", callback_data='links')],
-        [InlineKeyboardButton("ℹ️ About", callback_data='about')]
+        [InlineKeyboardButton("📜 Rules", callback_data='rules'), InlineKeyboardButton("ℹ️ About", callback_data='about')],
+        [InlineKeyboardButton("🌐 Telegram", url="https://telegram.org"), InlineKeyboardButton("💻 GitHub", url="https://github.com/yourrepo")],
+        [InlineKeyboardButton("📺 Join Channel", url="https://t.me/yourchannel")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text(
