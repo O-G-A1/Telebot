@@ -58,9 +58,11 @@ async def filter_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # Start command with buttons
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
-        [InlineKeyboardButton("📜 Rules", callback_data='rules'), InlineKeyboardButton("ℹ️ About", callback_data='about')],
-        [InlineKeyboardButton("🌐 Telegram", url="https://telegram.org"), InlineKeyboardButton("💻 GitHub", url="https://github.com/yourrepo")],
-        [InlineKeyboardButton("📺 Join Channel", url="https://t.me/yourchannel")]
+        [InlineKeyboardButton("📜 View Rules", callback_data='rules')],
+        [InlineKeyboardButton("ℹ️ About This Bot", callback_data='about')],
+        [InlineKeyboardButton("🪙 Crypto Portal", url="https://cryptoportal.byethost8.com")],
+        [InlineKeyboardButton("🌐 Telegram", url="https://telegram.org")],
+        [InlineKeyboardButton("💻 GitHub Repo", url="https://github.com/yourrepo")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text(
@@ -68,7 +70,6 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup=reply_markup
     )
 
-# Links command
 # Links command
 async def links_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
@@ -79,7 +80,7 @@ async def links_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text("🔗 Useful Links:", reply_markup=reply_markup)
-    
+
 # About command
 async def about_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
