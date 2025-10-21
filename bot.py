@@ -28,15 +28,15 @@ async def welcome(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # Help command
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(
-        "📘 Available commands:\n"
-        "/start - Welcome message\n"
-        "/help - Show help\n"
-        "/rules - Show group rules\n"
-        "/links - Useful resources\n"
-        "/about - About this bot"
-    )
-
+    keyboard = [
+        [InlineKeyboardButton("🏁 Start", callback_data='start')],
+        [InlineKeyboardButton("📜 Rules", callback_data='rules')],
+        [InlineKeyboardButton("🔗 Links", callback_data='links')],
+        [InlineKeyboardButton("ℹ️ About", callback_data='about')]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    await update.message.reply_text("📘 Available Commands:", reply_markup=reply_markup)
+    
 # Rules command
 async def rules_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
