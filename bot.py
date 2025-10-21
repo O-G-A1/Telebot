@@ -36,13 +36,18 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text("📘 Available Commands:", reply_markup=reply_markup)
-    
+
 # Rules command
 async def rules_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    keyboard = [
+        [InlineKeyboardButton("✅ I Accept", callback_data='accept_rules')],
+        [InlineKeyboardButton("❓ Ask a Question", url="https://t.me/yourchannel")]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text(
-        "📜 Group Rules:\n1. Be respectful\n2. No spam\n3. Use English only"
+        "📜 Group Rules:\n1. Be respectful\n2. No spam\n3. Use English only",
+        reply_markup=reply_markup
     )
-
 # Filter banned words
 async def filter_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text.lower()
@@ -66,19 +71,23 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # Links command
 async def links_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
-        [InlineKeyboardButton("Visit Telegram", url="https://telegram.org")],
-        [InlineKeyboardButton("Join Our Channel", url="https://t.me/yourchannel")],
-        [InlineKeyboardButton("GitHub Repo", url="https://github.com/yourrepo")]
+        [InlineKeyboardButton("🌐 Telegram", url="https://telegram.org")],
+        [InlineKeyboardButton("📺 Join Channel", url="https://t.me/yourchannel")],
+        [InlineKeyboardButton("💻 GitHub Repo", url="https://github.com/yourrepo")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text("🔗 Useful Links:", reply_markup=reply_markup)
 
 # About command
 async def about_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    keyboard = [
+        [InlineKeyboardButton("👨‍💻 Developer", url="https://t.me/gbenga")],
+        [InlineKeyboardButton("📢 Updates Channel", url="https://t.me/yourchannel")]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text(
-        "🤖 This bot helps manage your group.\n"
-        "It welcomes new members, filters spam, and shares useful info.\n"
-        "Built by Gbenga 💻"
+        "🤖 This bot helps manage your group.\nIt welcomes new members, filters spam, and shares useful info.\nBuilt by Gbenga 💻",
+        reply_markup=reply_markup
     )
 
 # Handle button callbacks
