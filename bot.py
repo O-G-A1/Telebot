@@ -11,9 +11,18 @@ import nest_asyncio
 nest_asyncio.apply()
 import os
 
+# For local testing, you can hardcode your token:
+# BOT_TOKEN = '8300808332:AAFpIwD_6wli3JKhrMu3elga8jF1jfIhdwM'
+
+# for railway
+import os
+
 BOT_TOKEN = os.environ['8300808332:AAFpIwD_6wli3JKhrMu3elga8jF1jfIhdwM']
 
-BOT_TOKEN = '8300808332:AAFpIwD_6wli3JKhrMu3elga8jF1jfIhdwM'  # Replace with your token
+if not BOT_TOKEN:
+    print("❌ BOT_TOKEN is missing. Check Railway variables.")
+    exit(1)
+
 
 BANNED_WORDS = ['spam', 'scam', 'badword']
 
@@ -54,10 +63,4 @@ async def main():
 # Entry point
 if __name__ == '__main__':
     import asyncio
-    asyncio.run(main())
-    import asyncio
-import nest_asyncio
-nest_asyncio.apply()
-
-if __name__ == '__main__':
     asyncio.run(main())
