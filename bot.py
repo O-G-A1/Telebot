@@ -48,11 +48,21 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def rules_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
         [InlineKeyboardButton("✅ I Accept", callback_data='accept_rules')],
-        [InlineKeyboardButton("❓ Ask a Question", url="https://t.me/yourchannel")]
+        [InlineKeyboardButton("❓ Ask a Question", url="https://t.me/cryptochainnetwork")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text(
-        "📜 Group Rules:\n1. Be respectful\n2. No spam\n3. Use English only",
+        "📜 Group Rules:\n"
+        "1. Be respectful to all members.\n"
+        "2. No spam, scams, or self-promotion.\n"
+        "3. Use English only in discussions.\n"
+        "4. No hate speech, racism, or discrimination.\n"
+        "5. Avoid sharing explicit or adult content.\n"
+        "6. Do not post fake news or misleading info.\n"
+        "7. Keep conversations on-topic.\n"
+        "8. No unsolicited private messages to members.\n"
+        "9. Report suspicious behavior to admins.\n"
+        "10. Admin decisions are final — follow instructions.",
         reply_markup=reply_markup
     )
 # Filter banned words
@@ -69,7 +79,6 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("ℹ️ About This Bot", callback_data='about')],
         [InlineKeyboardButton("🪙 Crypto Portal", url="https://cryptoportal.byethost8.com")],
         [InlineKeyboardButton("🌐 Telegram", url="https://telegram.org")],
-        [InlineKeyboardButton("💻 GitHub Repo", url="https://github.com/yourrepo")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text(
@@ -81,8 +90,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def links_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
         [InlineKeyboardButton("🌐 Telegram", url="https://telegram.org")],
-        [InlineKeyboardButton("📺 Join Channel", url="https://t.me/yourchannel")],
-        [InlineKeyboardButton("💻 GitHub Repo", url="https://github.com/yourrepo")],
+        [InlineKeyboardButton("📺 Join Channel", url="https://t.me/cryptochainnetwork")],
         [InlineKeyboardButton("🪙 Crypto Portal", url="https://cryptoportal.byethost8.com")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -92,7 +100,7 @@ async def links_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def about_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
         [InlineKeyboardButton("👨‍💻 Developer", url="https://t.me/gbenga")],
-        [InlineKeyboardButton("📢 Updates Channel", url="https://t.me/yourchannel")]
+        [InlineKeyboardButton("📢 Updates Channel", url="https://t.me/cryptochainnetwork")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text(
@@ -107,7 +115,17 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if query.data == 'rules':
         await query.edit_message_text(
-            "📜 Group Rules:\n1. Be respectful\n2. No spam\n3. Use English only"
+            "📜 Group Rules:\n"
+            "1. Be respectful to all members.\n"
+            "2. No spam, scams, or self-promotion.\n"
+            "3. Use English only in discussions.\n"
+            "4. No hate speech, racism, or discrimination.\n"
+            "5. Avoid sharing explicit or adult content.\n"
+            "6. Do not post fake news or misleading info.\n"
+            "7. Keep conversations on-topic.\n"
+            "8. No unsolicited private messages to members.\n"
+            "9. Report suspicious behavior to admins.\n"
+            "10. Admin decisions are final — follow instructions."
         )
     elif query.data == 'links':
         await links_command(update, context)
