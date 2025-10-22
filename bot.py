@@ -197,6 +197,9 @@ if not BOT_TOKEN:
     print("❌ BOT_TOKEN is missing. Check Railway variables.")
     exit(1)
 
+# 🔹 YOUR TELEGRAM USER ID (replace 123456789 with yours)
+ADMIN_USER_ID = 7432554286  # 👈 put your numeric Telegram ID here
+
 # States for conversation
 ASK_EMAIL, ASK_PROBLEM, ASK_EXTRA1, ASK_EXTRA2, ASK_EXTRA3, CONFIRM = range(6)
 
@@ -367,7 +370,26 @@ async def ask_extra2(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def ask_extra3(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["extra3"] = update.message.text
+
+    # 🔹 Send report to admin directly
+    report = (
+        "🚨 *New Problem Report Submitted*\n\n"
+        f"👤 User: @{update.effective_user.username or update.effective_user.first_name}\n"
+        f"📧 Email: {context.user_data.get('email')}\n"
+        f"💼 Platform: {context.user_data.get('problem')}\n"
+        f"📝 Description: {context.user_data.get('extra1')}\n"
+        f"❓ Question 1: {context.user_data.get('extra2')}\n"
+        f"❓ Question 2: {context.user_data.get('extra3')}"
+    )
+
     await update.message.reply_text("✅ Thank you! Our team will review your report and get back to you shortly.")
+
+    # Send to your Telegram account
+    try:
+        await context.bot.send_message(chat_id=ADMIN_USER_ID, text=report, parse_mode="Markdown")
+    except Exception as e:
+        print(f"❌ Failed to send report to admin: {e}")
+
     return ConversationHandler.END
 
 # Cancel handler
