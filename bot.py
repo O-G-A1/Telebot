@@ -214,12 +214,12 @@ from telegram.ext import (
     MessageHandler,
     CallbackQueryHandler,
     ContextTypes,
-    ChatMemberHandler,
     ConversationHandler,
     filters
 )
 import nest_asyncio
 import os
+
 nest_asyncio.apply()
 
 # --- Bot Configuration ---
@@ -241,15 +241,18 @@ BANNED_WORDS = [
 
 # --- Welcome New Members ---
 async def welcome(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat_member_update = update.chat_member
-    new_status = chat_member_update.new_chat_member.status
-    old_status = chat_member_update.old_chat_member.status
-    user = chat_member_update.new_chat_member.user
+    for member in update.message.new_chat_members:
+        await update.message.reply_text(
+            f"👋 Welcome {member.mention_html()}!\n"
+            f"Please read the group rules with /rules.",
+            parse_mode="HTML"
+        )
 
-    # Trigger only when a user actually joins
-    if old_status in ["left", "kicked"] and new_status == "member":
-        await update.effective_chat.send_message(
-            f"👋 Welcome {user.full_name}! Please read the group rules with /rules."
+# --- Goodbye for Leaving Members (optional) ---
+async def goodbye(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.message.left_chat_member:
+        await update.message.reply_text(
+            f"👋 {update.message.left_chat_member.full_name} has left the group."
         )
 
 # --- /help Command ---
@@ -317,12 +320,16 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if query.data == "rules":
         await rules_command(update, context)
+
     elif query.data == "links":
         await links_command(update, context)
+
     elif query.data == "about":
         await about_command(update, context)
+
     elif query.data == "accept_rules":
         await query.edit_message_text("✅ Thank you! You may now participate in the group.")
+
     elif query.data == "report_problem":
         await query.message.reply_text("📧 Please enter your email address:")
         return ASK_EMAIL
@@ -372,47 +379,4 @@ async def ask_extra2(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # --- Cancel ---
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("❌ Operation cancelled.")
-    return ConversationHandler.END
-
-# --- Message Filter ---
-async def filter_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    text = update.message.text.lower()
-    if any(word in text for word in BANNED_WORDS):
-        await update.message.delete()
-        await update.message.reply_text("⚠️ Message deleted: contains banned words.")
-
-# --- Main ---
-async def main():
-    app = ApplicationBuilder().token(BOT_TOKEN).build()
-
-    conv_handler = ConversationHandler(
-        entry_points=[CallbackQueryHandler(button_handler, pattern="^report_problem$")],
-        states={
-            ASK_EMAIL: [MessageHandler(filters.TEXT & ~filters.COMMAND, ask_email)],
-            ASK_PLATFORM: [MessageHandler(filters.TEXT & ~filters.COMMAND, ask_platform)],
-            ASK_DESCRIPTION: [MessageHandler(filters.TEXT & ~filters.COMMAND, ask_description)],
-            ASK_EXTRA1: [MessageHandler(filters.TEXT & ~filters.COMMAND, ask_extra1)],
-            ASK_EXTRA2: [MessageHandler(filters.TEXT & ~filters.COMMAND, ask_extra2)],
-        },
-        fallbacks=[CommandHandler("cancel", cancel)],
-    )
-
-    app.add_handler(conv_handler)
-    app.add_handler(CommandHandler("start", start_command))
-    app.add_handler(CommandHandler("help", help_command))
-    app.add_handler(CommandHandler("rules", rules_command))
-    app.add_handler(CommandHandler("links", links_command))
-    app.add_handler(CommandHandler("about", about_command))
-    app.add_handler(CallbackQueryHandler(button_handler))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, filter_messages))
-    # ✅ Corrected welcome handler
-    app.add_handler(ChatMemberHandler(welcome, chat_member_types=["chat_member"]))
-
-    print("✅ Bot is running...")
-    await app.run_polling()
-
-# --- Entry Point ---
-if __name__ == "__main__":
-    import asyncio
-    asyncio.run(main())
+    await update.message.reply
