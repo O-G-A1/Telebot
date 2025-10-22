@@ -301,42 +301,50 @@ async def about_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup=reply_markup
     )
 
-# --- SUPPORT CONVERSATION ---
+# --- SUPPORT CONVERSATION HANDLERS FIXED ---
+
+# Start support from callback
 async def start_support(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.callback_query.answer()
-    await update.callback_query.message.reply_text(
-        "🆘 Let's help you with your wallet or account issue.\nPlease enter your *email address* 📧:",
+    query = update.callback_query
+    await query.answer()
+    await query.message.reply_text(
+        "🆘 Let's help you with your wallet or account issue.\n"
+        "Please enter your *email address* 📧:",
         parse_mode="Markdown"
     )
     return ASK_EMAIL
 
+
 async def ask_phone(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    context.user_data["email"] = update.message.text
+    context.user_data["email"] = update.message.text.strip()
     await update.message.reply_text("📱 Great! Now, please enter your *phone number*:")
     return ASK_PHONE
 
+
 async def ask_issue_type(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    context.user_data["phone"] = update.message.text
+    context.user_data["phone"] = update.message.text.strip()
     keyboard = [
         ["🔑 Login Issue", "💸 Withdrawal Problem"],
         ["💰 Transaction Failed", "📩 Other"]
     ]
     await update.message.reply_text(
         "Please select the type of issue you're facing:",
-        reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True)
+        reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True, resize_keyboard=True)
     )
     return ASK_ISSUE_TYPE
 
+
 async def ask_description(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    context.user_data["issue_type"] = update.message.text
+    context.user_data["issue_type"] = update.message.text.strip()
     await update.message.reply_text(
         "🧾 Please describe your issue briefly:",
         reply_markup=ReplyKeyboardRemove()
     )
     return ASK_DESCRIPTION
 
+
 async def finish_support(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    context.user_data["description"] = update.message.text
+    context.user_data["description"] = update.message.text.strip()
     user = update.effective_user
 
     email = context.user_data["email"]
@@ -353,20 +361,14 @@ async def finish_support(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"📝 *Description:* {description}"
     )
 
-    # Send confirmation to user
-    await update.message.reply_text(
-        "✅ Thank you! Our support team will contact you soon.",
-    )
-
-    # Send collected info to admin (replace with your chat ID)
+    await update.message.reply_text("✅ Thank you! Our support team will contact you soon.")
+    
+    # Send to admin (replace this with your Telegram ID)
     ADMIN_CHAT_ID = "YOUR_TELEGRAM_ID_HERE"
-    await context.bot.send_message(
-        chat_id=ADMIN_CHAT_ID,
-        text=summary,
-        parse_mode="Markdown"
-    )
+    await context.bot.send_message(chat_id=ADMIN_CHAT_ID, text=summary, parse_mode="Markdown")
 
     return ConversationHandler.END
+
 
 async def cancel_support(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("❌ Support process cancelled.", reply_markup=ReplyKeyboardRemove())
