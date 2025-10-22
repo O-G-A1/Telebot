@@ -205,14 +205,13 @@
 #     import asyncio
 #     asyncio.run(main())
 
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ChatMember
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
     MessageHandler,
     CallbackQueryHandler,
     ContextTypes,
-    ChatMemberHandler,
     ConversationHandler,
     filters
 )
@@ -238,16 +237,15 @@ BANNED_WORDS = [
 ]
 
 # --- Welcome New Members ---
-async def welcome(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat_member = update.chat_member
-    if chat_member.new_chat_member.status == ChatMember.MEMBER:
-        member = chat_member.new_chat_member.user
-        keyboard = [
-            [InlineKeyboardButton("✅ I Accept", callback_data='accept_rules')],
-            [InlineKeyboardButton("❓ Ask a Question", url="https://t.me/cryptochainnetwork")]
-        ]
+async def welcome_new_members(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    for member in update.message.new_chat_members:
+        # Welcome message
+        await update.message.reply_text(
+            f"👋 Welcome {member.full_name}! Please take a moment to read our group rules below 👇"
+        )
+
+        # Automatically send rules after welcome
         rules_text = (
-            f"👋 Welcome {member.full_name}!\n\n"
             "📜 *Group Rules*\n"
             "1️⃣ Be respectful to all members 🤝\n"
             "2️⃣ No spam, scams, or self-promotion 🚫📢\n"
@@ -256,9 +254,11 @@ async def welcome(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "5️⃣ Avoid adult or explicit content 🔞\n"
             "6️⃣ Report suspicious behavior 🕵️‍♂️"
         )
-        await update.effective_chat.send_message(
-            rules_text, parse_mode="Markdown", reply_markup=InlineKeyboardMarkup(keyboard)
-        )
+        keyboard = [
+            [InlineKeyboardButton("✅ I Accept", callback_data='accept_rules')],
+            [InlineKeyboardButton("❓ Ask a Question", url="https://t.me/cryptochainnetwork")]
+        ]
+        await update.message.reply_text(rules_text, parse_mode="Markdown", reply_markup=InlineKeyboardMarkup(keyboard))
 
 # --- /help Command ---
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -325,16 +325,12 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if query.data == "rules":
         await rules_command(update, context)
-
     elif query.data == "links":
         await links_command(update, context)
-
     elif query.data == "about":
         await about_command(update, context)
-
     elif query.data == "accept_rules":
         await query.edit_message_text("✅ Thank you! You may now participate in the group.")
-
     elif query.data == "report_problem":
         await query.message.reply_text("📧 Please enter your email address:")
         return ASK_EMAIL
@@ -418,7 +414,7 @@ async def main():
     app.add_handler(CommandHandler("about", about_command))
     app.add_handler(CallbackQueryHandler(button_handler))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, filter_messages))
-    app.add_handler(ChatMemberHandler(welcome, ChatMemberHandler.CHAT_MEMBER))
+    app.add_handler(MessageHandler(filters.StatusUpdate.NEW_CHAT_MEMBERS, welcome_new_members))
 
     print("✅ Bot is running...")
     await app.run_polling()
