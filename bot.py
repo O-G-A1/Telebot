@@ -229,6 +229,8 @@ from telegram.ext import (
 )
 import nest_asyncio
 import os
+import asyncio
+
 nest_asyncio.apply()
 
 # --- Bot Configuration ---
@@ -238,7 +240,7 @@ if not BOT_TOKEN:
     exit(1)
 
 ADMIN_USER_ID = 7432554286  # 👈 Your Telegram numeric user ID
-GROUP_CHAT_ID = -1000000000000  # 👈 Replace this with your actual group chat ID
+# GROUP_CHAT_ID = -1001234567890  # 👈 Replace this with your real group chat ID!
 
 # --- Conversation States ---
 ASK_EMAIL, ASK_PLATFORM, ASK_DESCRIPTION, ASK_EXTRA1, ASK_EXTRA2 = range(5)
@@ -332,7 +334,6 @@ async def about_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-
     if query.data == "rules":
         await rules_command(update, context)
     elif query.data == "links":
@@ -415,6 +416,11 @@ async def post_security_notice(context: ContextTypes.DEFAULT_TYPE):
 async def main():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
 
+    # --- Add Job Queue for Security Notice ---
+    job_queue = app.job_queue
+    job_queue.run_repeating(post_security_notice, interval=20, first=10)  # 20 seconds for test
+
+    # --- Add Handlers ---
     conv_handler = ConversationHandler(
         entry_points=[CallbackQueryHandler(button_handler, pattern="^report_problem$")],
         states={
@@ -437,14 +443,9 @@ async def main():
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, filter_messages))
     app.add_handler(MessageHandler(filters.StatusUpdate.NEW_CHAT_MEMBERS, welcome_new_members))
 
-    # --- Schedule the periodic security notice (every 4 hours) ---
-    job_queue = app.job_queue
-    job_queue.run_repeating(post_security_notice, interval=4 * 60 * 60, first=10)
-
     print("✅ Bot is running...")
-    await app.run_polling()
+    await app.run_polling(close_loop=False)
 
 # --- Entry Point ---
 if __name__ == "__main__":
-    import asyncio
     asyncio.run(main())
