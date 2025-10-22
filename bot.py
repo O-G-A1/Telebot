@@ -347,22 +347,22 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # --- Conversation Flow for Report Problem ---
 async def ask_email(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["email"] = update.message.text
-    await update.message.reply_text("📄 Please describe your wallet or account issue in detail:")
+    await update.message.reply_text("📄 What wallet or platform are you experiencing issues with?:")
     return ASK_PROBLEM
 
 async def ask_problem(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["problem"] = update.message.text
-    await update.message.reply_text("❓ Question 1: When did this issue start?")
+    await update.message.reply_text("Please describe your issue briefly.")
     return ASK_EXTRA1
 
 async def ask_extra1(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["extra1"] = update.message.text
-    await update.message.reply_text("❓ Question 2: Have you tried any troubleshooting steps?")
+    await update.message.reply_text("Proposed question.")
     return ASK_EXTRA2
 
 async def ask_extra2(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["extra2"] = update.message.text
-    await update.message.reply_text("❓ Question 3: What device or wallet app are you using?")
+    await update.message.reply_text("Proposed question2?")
     return ASK_EXTRA3
 
 async def ask_extra3(update: Update, context: ContextTypes.DEFAULT_TYPE):
