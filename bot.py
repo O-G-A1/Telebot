@@ -216,12 +216,14 @@ BANNED_WORDS = [
 # --- Conversation states ---
 ASK_EMAIL, ASK_PHONE, ASK_ISSUE_TYPE, ASK_DESCRIPTION = range(4)
 
+
 # --- WELCOME NEW MEMBERS ---
 async def welcome(update: Update, context: ContextTypes.DEFAULT_TYPE):
     for member in update.chat_member.new_chat_members:
         await update.effective_chat.send_message(
             f"👋 Welcome {member.full_name}! Please read the group rules with /rules."
         )
+
 
 # --- HELP COMMAND ---
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -234,6 +236,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text("📘 Choose a help option:", reply_markup=reply_markup)
+
 
 # --- RULES COMMAND ---
 async def rules_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -258,12 +261,14 @@ async def rules_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         parse_mode="Markdown"
     )
 
+
 # --- FILTER MESSAGES ---
 async def filter_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text.lower()
     if any(word in text for word in BANNED_WORDS):
         await update.message.delete()
         await update.message.reply_text("⚠️ Message deleted: contains banned words.")
+
 
 # --- START COMMAND ---
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -279,6 +284,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup=reply_markup
     )
 
+
 # --- LINKS COMMAND ---
 async def links_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
@@ -289,6 +295,7 @@ async def links_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text("🔗 Useful Links:", reply_markup=reply_markup)
 
+
 # --- ABOUT COMMAND ---
 async def about_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
@@ -297,13 +304,12 @@ async def about_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text(
-        "🤖 This bot helps manage your group.\nIt welcomes new members, filters spam, and provides support.\nBuilt by Gbenga 💻",
+        "🤖 This bot helps manage your group.\nIt welcomes new members, filters spam, and provides wallet/account support.\nBuilt by Gbenga 💻",
         reply_markup=reply_markup
     )
 
-# --- SUPPORT CONVERSATION HANDLERS FIXED ---
 
-# Start support from callback
+# --- SUPPORT FLOW ---
 async def start_support(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -317,7 +323,7 @@ async def start_support(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def ask_phone(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["email"] = update.message.text.strip()
-    await update.message.reply_text("📱 Great! Now, please enter your *phone number*:")
+    await update.message.reply_text("📱 Great! Now, please enter your *phone number*:", parse_mode="Markdown")
     return ASK_PHONE
 
 
@@ -354,7 +360,7 @@ async def finish_support(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     summary = (
         f"🆘 *Support Request Received!*\n\n"
-        f"👤 *User:* {user.first_name} (@{user.username})\n"
+        f"👤 *User:* {user.first_name} (@{user.username or 'N/A'})\n"
         f"📧 *Email:* {email}\n"
         f"📱 *Phone:* {phone}\n"
         f"🪙 *Issue Type:* {issue_type}\n"
@@ -363,8 +369,7 @@ async def finish_support(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text("✅ Thank you! Our support team will contact you soon.")
     
-    # Send to admin (replace this with your Telegram ID)
-    ADMIN_CHAT_ID = "YOUR_TELEGRAM_ID_HERE"
+    ADMIN_CHAT_ID = "YOUR_TELEGRAM_ID_HERE"  # 👈 Replace with your Telegram ID
     await context.bot.send_message(chat_id=ADMIN_CHAT_ID, text=summary, parse_mode="Markdown")
 
     return ConversationHandler.END
@@ -373,6 +378,7 @@ async def finish_support(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def cancel_support(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("❌ Support process cancelled.", reply_markup=ReplyKeyboardRemove())
     return ConversationHandler.END
+
 
 # --- BUTTON HANDLER ---
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -408,7 +414,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif query.data == 'about':
         await query.message.reply_text(
             "🤖 This bot helps manage your group.\n"
-            "It welcomes new members, filters spam, and provides support.\n"
+            "It welcomes new members, filters spam, and provides wallet/account support.\n"
             "Built by Gbenga 💻",
             reply_markup=InlineKeyboardMarkup([
                 [InlineKeyboardButton("👨‍💻 Developer", url="https://t.me/gbenga")],
@@ -422,11 +428,25 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif query.data == 'support':
         return await start_support(update, context)
 
+
 # --- MAIN FUNCTION ---
 async def main():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
 
+    # Conversation handler for support
+    support_conv = ConversationHandler(
+        entry_points=[CallbackQueryHandler(start_support, pattern='^support$')],
+        states={
+            ASK_EMAIL: [MessageHandler(filters.TEXT & ~filters.COMMAND, ask_phone)],
+            ASK_PHONE: [MessageHandler(filters.TEXT & ~filters.COMMAND, ask_issue_type)],
+            ASK_ISSUE_TYPE: [MessageHandler(filters.TEXT & ~filters.COMMAND, ask_description)],
+            ASK_DESCRIPTION: [MessageHandler(filters.TEXT & ~filters.COMMAND, finish_support)],
+        },
+        fallbacks=[CommandHandler("cancel", cancel_support)],
+    )
+
     # Add handlers
+    app.add_handler(support_conv)
     app.add_handler(CommandHandler("start", start_command))
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(CommandHandler("rules", rules_command))
@@ -436,22 +456,9 @@ async def main():
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, filter_messages))
     app.add_handler(ChatMemberHandler(welcome, ChatMemberHandler.CHAT_MEMBER))
 
-    # Conversation handler for support
-    support_conv = ConversationHandler(
-        entry_points=[CallbackQueryHandler(start_support, pattern='^support$')],
-        states={
-            ASK_EMAIL: [MessageHandler(filters.TEXT & ~filters.COMMAND, ask_phone)],
-            ASK_PHONE: [MessageHandler(filters.TEXT & ~filters.COMMAND, ask_issue_type)],
-            ASK_ISSUE_TYPE: [MessageHandler(filters.TEXT & ~filters.COMMAND, ask_description)],
-            ASK_DESCRIPTION: [MessageHandler(filters.TEXT & ~filters.COMMAND, finish_support)]
-        },
-        fallbacks=[CommandHandler("cancel", cancel_support)]
-    )
-
-    app.add_handler(support_conv)
-
     print("✅ Bot is running...")
     await app.run_polling()
+
 
 # --- ENTRY POINT ---
 if __name__ == '__main__':
