@@ -5,7 +5,6 @@
 #     MessageHandler,
 #     CallbackQueryHandler,
 #     ContextTypes,
-#     ChatMemberHandler,
 #     ConversationHandler,
 #     filters
 # )
@@ -31,11 +30,28 @@
 # ]
 
 # # --- Welcome New Members ---
-# async def welcome(update: Update, context: ContextTypes.DEFAULT_TYPE):
-#     for member in update.chat_member.new_chat_members:
-#         await update.effective_chat.send_message(
-#             f"👋 Welcome {member.full_name}! Please read the group rules with /rules."
+# async def welcome_new_members(update: Update, context: ContextTypes.DEFAULT_TYPE):
+#     for member in update.message.new_chat_members:
+#         # Welcome message
+#         await update.message.reply_text(
+#             f"👋 Welcome {member.full_name}! Please take a moment to read our group rules below 👇"
 #         )
+
+#         # Automatically send rules after welcome
+#         rules_text = (
+#             "📜 *Group Rules*\n"
+#             "1️⃣ Be respectful to all members 🤝\n"
+#             "2️⃣ No spam, scams, or self-promotion 🚫📢\n"
+#             "3️⃣ Use English only 🇬🇧\n"
+#             "4️⃣ No hate speech or discrimination ❌\n"
+#             "5️⃣ Avoid adult or explicit content 🔞\n"
+#             "6️⃣ Report suspicious behavior 🕵️‍♂️"
+#         )
+#         keyboard = [
+#             [InlineKeyboardButton("✅ I Accept", callback_data='accept_rules')],
+#             [InlineKeyboardButton("❓ Ask a Question", url="https://t.me/cryptochainnetwork")]
+#         ]
+#         await update.message.reply_text(rules_text, parse_mode="Markdown", reply_markup=InlineKeyboardMarkup(keyboard))
 
 # # --- /help Command ---
 # async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -102,16 +118,12 @@
 
 #     if query.data == "rules":
 #         await rules_command(update, context)
-
 #     elif query.data == "links":
 #         await links_command(update, context)
-
 #     elif query.data == "about":
 #         await about_command(update, context)
-
 #     elif query.data == "accept_rules":
 #         await query.edit_message_text("✅ Thank you! You may now participate in the group.")
-
 #     elif query.data == "report_problem":
 #         await query.message.reply_text("📧 Please enter your email address:")
 #         return ASK_EMAIL
@@ -195,7 +207,7 @@
 #     app.add_handler(CommandHandler("about", about_command))
 #     app.add_handler(CallbackQueryHandler(button_handler))
 #     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, filter_messages))
-#     app.add_handler(ChatMemberHandler(welcome, ChatMemberHandler.CHAT_MEMBER))
+#     app.add_handler(MessageHandler(filters.StatusUpdate.NEW_CHAT_MEMBERS, welcome_new_members))
 
 #     print("✅ Bot is running...")
 #     await app.run_polling()
@@ -213,7 +225,7 @@ from telegram.ext import (
     CallbackQueryHandler,
     ContextTypes,
     ConversationHandler,
-    filters
+    filters,
 )
 import nest_asyncio
 import os
@@ -226,6 +238,7 @@ if not BOT_TOKEN:
     exit(1)
 
 ADMIN_USER_ID = 7432554286  # 👈 Your Telegram numeric user ID
+GROUP_CHAT_ID = -1000000000000  # 👈 Replace this with your actual group chat ID
 
 # --- Conversation States ---
 ASK_EMAIL, ASK_PLATFORM, ASK_DESCRIPTION, ASK_EXTRA1, ASK_EXTRA2 = range(5)
@@ -239,12 +252,9 @@ BANNED_WORDS = [
 # --- Welcome New Members ---
 async def welcome_new_members(update: Update, context: ContextTypes.DEFAULT_TYPE):
     for member in update.message.new_chat_members:
-        # Welcome message
         await update.message.reply_text(
             f"👋 Welcome {member.full_name}! Please take a moment to read our group rules below 👇"
         )
-
-        # Automatically send rules after welcome
         rules_text = (
             "📜 *Group Rules*\n"
             "1️⃣ Be respectful to all members 🤝\n"
@@ -358,7 +368,6 @@ async def ask_extra1(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def ask_extra2(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["extra2"] = update.message.text
-
     user = update.effective_user
     report = (
         "🚨 *New Problem Report Submitted*\n\n"
@@ -369,13 +378,11 @@ async def ask_extra2(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"📄 Extra Info 1: {context.user_data.get('extra1')}\n"
         f"📄 Extra Info 2: {context.user_data.get('extra2')}"
     )
-
     await update.message.reply_text("✅ Thank you! Our team will review your report soon.")
     try:
         await context.bot.send_message(chat_id=ADMIN_USER_ID, text=report, parse_mode="Markdown")
     except Exception as e:
         print(f"❌ Error sending report to admin: {e}")
-
     return ConversationHandler.END
 
 # --- Cancel ---
@@ -389,6 +396,20 @@ async def filter_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if any(word in text for word in BANNED_WORDS):
         await update.message.delete()
         await update.message.reply_text("⚠️ Message deleted: contains banned words.")
+
+# --- Periodic Security Notice ---
+async def post_security_notice(context: ContextTypes.DEFAULT_TYPE):
+    message = (
+        "🚨 *IMPORTANT NOTICE* 🚨\n\n"
+        "Admins will *NEVER DM you first*.\n"
+        "If anyone messages you privately claiming to be an admin — it’s a *SCAM* ❌\n\n"
+        "Stay safe and *report suspicious users immediately!* ⚠️"
+    )
+    try:
+        await context.bot.send_message(chat_id=GROUP_CHAT_ID, text=message, parse_mode="Markdown")
+        print("🔁 Security notice posted.")
+    except Exception as e:
+        print(f"❌ Failed to post security notice: {e}")
 
 # --- Main ---
 async def main():
@@ -415,6 +436,10 @@ async def main():
     app.add_handler(CallbackQueryHandler(button_handler))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, filter_messages))
     app.add_handler(MessageHandler(filters.StatusUpdate.NEW_CHAT_MEMBERS, welcome_new_members))
+
+    # --- Schedule the periodic security notice (every 4 hours) ---
+    job_queue = app.job_queue
+    job_queue.run_repeating(post_security_notice, interval=4 * 60 * 60, first=10)
 
     print("✅ Bot is running...")
     await app.run_polling()
